@@ -29,6 +29,12 @@ class DebugLogger {
         error: error,
         stackTrace: stackTrace,
       );
+
+      // debugPrint is guaranteed to print to the console/terminal of flutter run
+      debugPrint(buffer.toString());
+      if (stackTrace != null) {
+        debugPrint(stackTrace.toString());
+      }
     }
   }
 
@@ -40,6 +46,7 @@ class DebugLogger {
         name: name,
         level: 800, // Info
       );
+      debugPrint('ℹ️ [$name] $message');
     }
   }
 }
