@@ -4,6 +4,16 @@ enum TrackStatus {
   locked,
 }
 
+class LearningSubCategory {
+  final String id;
+  final String title;
+
+  const LearningSubCategory({
+    required this.id,
+    required this.title,
+  });
+}
+
 class LearningTrack {
   final String id;
   final String title;
@@ -13,6 +23,7 @@ class LearningTrack {
   final int bgColorHex;
   final int textColorHex;
   final int borderColorHex;
+  final List<LearningSubCategory>? subCategories;
 
   const LearningTrack({
     required this.id,
@@ -23,5 +34,6 @@ class LearningTrack {
     required this.bgColorHex,
     required this.textColorHex,
     required this.borderColorHex,
+    this.subCategories,
   });
 }

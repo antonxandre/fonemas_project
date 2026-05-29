@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../../../ui/core/theme/miki_design_system.dart';
+import '../view_models/track_sub_path_view_model.dart';
 
 class TrackSubPathPage extends StatefulWidget {
   final String trackId;
+  final String? subCategoryId;
 
   const TrackSubPathPage({
     super.key,
     required this.trackId,
+    this.subCategoryId,
   });
 
   @override
@@ -52,6 +56,8 @@ class _TrackSubPathPageState extends State<TrackSubPathPage> with SingleTickerPr
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = context.watch<TrackSubPathViewModel>();
+    
     return Scaffold(
       backgroundColor: MikiColors.background,
       extendBody: true,
@@ -89,53 +95,53 @@ class _TrackSubPathPageState extends State<TrackSubPathPage> with SingleTickerPr
                           padding: const EdgeInsets.symmetric(vertical: 24.0),
                           child: Column(
                             children: [
-                              // Node 1: Completed
-                              _buildSubPathNode(
-                                label: '/s/ Inicial',
-                                status: SubNodeStatus.completed,
-                                horizontalOffset: 0,
-                              ),
-                              const SizedBox(height: 24),
-
-                              // Node 2: Completed
-                              _buildSubPathNode(
-                                label: 'Grupos de /r/',
-                                status: SubNodeStatus.completed,
-                                horizontalOffset: 48,
-                              ),
-                              const SizedBox(height: 24),
-
-                              // Node 3: Active (tappable)
-                              _buildSubPathNode(
-                                label: '/l/ Inicial',
-                                symbol: '/l/',
-                                status: SubNodeStatus.active,
-                                horizontalOffset: -48,
-                                onTap: () => context.push('/exercise/${widget.trackId}'),
-                              ),
-                              const SizedBox(height: 24),
-
-                              // Node 4: Locked
-                              _buildSubPathNode(
-                                label: 'Africados /ch/',
-                                status: SubNodeStatus.locked,
-                                horizontalOffset: 32,
-                              ),
-                              const SizedBox(height: 24),
-
-                              // Node 5: Locked
-                              _buildSubPathNode(
-                                label: 'Fricativos /th/',
-                                status: SubNodeStatus.locked,
-                                horizontalOffset: -64,
-                              ),
+                              if (viewModel.isLoading)
+                                const Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 40.0),
+                                  child: CircularProgressIndicator(color: MikiColors.primary),
+                                )
+                              else if (viewModel.errorMessage != null)
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 40.0, horizontal: 16.0),
+                                  child: Text(
+                                    viewModel.errorMessage!,
+                                    textAlign: TextAlign.center,
+                                    style: MikiTextStyles.labelMd(color: Colors.red),
+                                  ),
+                                )
+                              else if (viewModel.phonemes.isEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 40.0),
+                                  child: Text('Nenhum fonema encontrado.', style: MikiTextStyles.labelMd(color: MikiColors.text)),
+                                )
+                              else
+                                ...List.generate(viewModel.phonemes.length, (index) {
+                                  final phoneme = viewModel.phonemes[index];
+                                  // Alternate horizontal offsets for the wavy path
+                                  final double horizontalOffset = index % 2 == 0 ? 48.0 : -48.0;
+                                  
+                                  return Column(
+                                    children: [
+                                      _buildSubPathNode(
+                                        label: phoneme.name,
+                                        symbol: phoneme.symbol,
+                                        status: index == 0 ? SubNodeStatus.active : SubNodeStatus.locked, // Only first is active for demo
+                                        horizontalOffset: horizontalOffset,
+                                        onTap: () => context.push('/exercise/${widget.trackId}'),
+                                      ),
+                                      if (index < viewModel.phonemes.length - 1)
+                                        const SizedBox(height: 24),
+                                    ],
+                                  );
+                                }),
                               const SizedBox(height: 36),
 
                               // Final Destination Node
-                              _buildFinalDestinationNode(
-                                label: 'O Grande Orador',
-                                horizontalOffset: 0,
-                              ),
+                              if (!viewModel.isLoading && viewModel.phonemes.isNotEmpty)
+                                _buildFinalDestinationNode(
+                                  label: 'O Grande Orador',
+                                  horizontalOffset: 0,
+                                ),
                             ],
                           ),
                         ),

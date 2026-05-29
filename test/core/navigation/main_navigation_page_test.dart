@@ -9,6 +9,8 @@ import 'package:fonemas_app/data/repositories/mock_learning_path_repository.dart
 import 'package:fonemas_app/ui/features/study/view_models/study_view_model.dart';
 import 'package:fonemas_app/data/repositories/mock_study_repository.dart';
 import 'package:fonemas_app/ui/core/navigation/router.dart';
+import 'package:fonemas_app/ui/features/auth/view_models/auth_view_model.dart';
+import 'package:fonemas_app/data/repositories/mock_auth_repository.dart';
 
 void main() {
   testWidgets('MainNavigationPage renders and switches tabs', (WidgetTester tester) async {
@@ -16,25 +18,32 @@ void main() {
       MultiProvider(
         providers: [
           ChangeNotifierProvider(
+            create: (_) => AuthViewModel(MockAuthRepository()),
+          ),
+          ChangeNotifierProvider(
             create: (_) => LearningPathViewModel(MockLearningPathRepository())..loadTracks(),
           ),
           ChangeNotifierProvider(
             create: (_) => StudyViewModel(MockStudyRepository())..loadBooks(),
           ),
         ],
-        child: MaterialApp.router(
-          routerConfig: mikiRouter,
+        child: Builder(
+          builder: (context) {
+            final router = createMikiRouter(context.read<AuthViewModel>());
+            return MaterialApp.router(
+              routerConfig: router,
           localizationsDelegates: const [
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          supportedLocales: const [
-            Locale('pt', 'BR'),
-            Locale('pt'),
-          ],
-        ),
+            supportedLocales: const [
+              Locale('pt', 'BR'),
+              Locale('pt'),
+            ],
+          );
+        }),
       ),
     );
 

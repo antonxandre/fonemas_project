@@ -17,6 +17,10 @@ class MockLearningPathRepository implements LearningPathRepository {
         bgColorHex: 0x4DDFE1F9,      // bg-primary-container/30 (adjusted for Flutter)
         borderColorHex: 0x336B6E94,  // border-primary/20
         textColorHex: 0xFF6B6E94,    // MikiColors.primary
+        subCategories: [
+          LearningSubCategory(id: 'orais', title: 'Orais'),
+          LearningSubCategory(id: 'nasais', title: 'Nasais'),
+        ],
       ),
       const LearningTrack(
         id: 'bilabiais',
@@ -26,6 +30,10 @@ class MockLearningPathRepository implements LearningPathRepository {
         bgColorHex: 0x4DE0F2F5,      // bg-secondary-container/30
         borderColorHex: 0x335A7A7F,  // border-secondary/20
         textColorHex: 0xFF5A7A7F,    // MikiColors.secondary
+        subCategories: [
+          LearningSubCategory(id: 'surdas', title: 'Surdas'),
+          LearningSubCategory(id: 'sonoras', title: 'Sonoras'),
+        ],
       ),
       const LearningTrack(
         id: 'alveolares',
@@ -35,6 +43,10 @@ class MockLearningPathRepository implements LearningPathRepository {
         bgColorHex: 0x4DFCE4E4,      // bg-tertiary-container/30
         borderColorHex: 0x338A6666,  // border-tertiary/20
         textColorHex: 0xFF8A6666,    // MikiColors.tertiary
+        subCategories: [
+          LearningSubCategory(id: 'surdas', title: 'Surdas'),
+          LearningSubCategory(id: 'sonoras', title: 'Sonoras'),
+        ],
       ),
       const LearningTrack(
         id: 'velares',
@@ -44,6 +56,10 @@ class MockLearningPathRepository implements LearningPathRepository {
         bgColorHex: 0x33E0E1F9,      // bg-primary-container/20
         borderColorHex: 0x336B6E94,  // border-primary/20
         textColorHex: 0xFF6B6E94,    // MikiColors.primary
+        subCategories: [
+          LearningSubCategory(id: 'surdas', title: 'Surdas'),
+          LearningSubCategory(id: 'sonoras', title: 'Sonoras'),
+        ],
       ),
       const LearningTrack(
         id: 'fricativas',
@@ -53,6 +69,10 @@ class MockLearningPathRepository implements LearningPathRepository {
         bgColorHex: 0x33E0F2F5,      // bg-secondary-container/20
         borderColorHex: 0x335A7A7F,  // border-secondary/20
         textColorHex: 0xFF5A7A7F,    // MikiColors.secondary
+        subCategories: [
+          LearningSubCategory(id: 'surdas', title: 'Surdas'),
+          LearningSubCategory(id: 'sonoras', title: 'Sonoras'),
+        ],
       ),
       const LearningTrack(
         id: 'pratica_diaria',

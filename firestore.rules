@@ -1,0 +1,47 @@
+rules_version = '2';
+
+// ===============================================================
+// Assumed Data Model
+// ===============================================================
+//
+// This security rules file assumes the following data structures:
+//
+// Collection: phonemes
+// Document ID: phonemeId (e.g. 'vogal_oral_a')
+// Fields:
+//   - id: string (required) - unique identifier matching document ID
+//   - symbol: string (required) - phonetic symbol (e.g. '/a/')
+//   - name: string (required) - descriptive name (e.g. 'Aberta, Central')
+//   - examples: list of strings (required) - examples of the sound usage
+//   - categoryId: string (required) - e.g. 'vogais'
+//   - subcategoryId: string (required) - e.g. 'orais'
+//   - locale: string (required) - e.g. 'pt_BR'
+//
+// ===============================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+  
+    // Domain Validators for Phoneme
+    function isValidPhoneme(data) {
+      return data.keys().hasAll(['id', 'symbol', 'name', 'examples', 'categoryId', 'subcategoryId', 'locale']) &&
+             data.keys().hasOnly(['id', 'symbol', 'name', 'examples', 'categoryId', 'subcategoryId', 'locale']) &&
+             data.id is string && data.id.size() < 100 &&
+             data.symbol is string && data.symbol.size() < 20 &&
+             data.name is string && data.name.size() < 100 &&
+             data.examples is list && data.examples.size() < 10 &&
+             data.categoryId is string && data.categoryId.size() < 50 &&
+             data.subcategoryId is string && data.subcategoryId.size() < 50 &&
+             data.locale is string && data.locale.size() < 10;
+    }
+
+    match /phonemes/{phonemeId} {
+      // Allow read access for everyone so users can view phonemes in the app
+      allow read: if true;
+      
+      // Allow write access for database seeding (temporarily open for prototype, needs hardening)
+      allow create, update: if isValidPhoneme(request.resource.data);
+      allow delete: if false; // Deny deletes entirely
+    }
+  }
+}

@@ -12,3 +12,6 @@ PRODUCT_BUNDLE_IDENTIFIER = com.example.fonemasApp
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2026 com.example. All rights reserved.
+
+CODE_SIGN_ALLOW_ENTITLEMENTS_MODIFICATION = YES
+

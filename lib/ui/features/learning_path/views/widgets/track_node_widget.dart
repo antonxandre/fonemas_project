@@ -7,12 +7,14 @@ class TrackNodeWidget extends StatefulWidget {
   final LearningTrack track;
   final double horizontalOffset;
   final VoidCallback? onTap;
+  final void Function(String subCategoryId)? onSubCategoryTap;
 
   const TrackNodeWidget({
     super.key,
     required this.track,
     required this.horizontalOffset,
     this.onTap,
+    this.onSubCategoryTap,
   });
 
   @override
@@ -24,6 +26,9 @@ class _TrackNodeWidgetState extends State<TrackNodeWidget>
   late AnimationController _animController;
   late Animation<double> _scaleAnimation;
   late AnimationController _spinController;
+  late AnimationController _expandController;
+  late Animation<double> _expandAnimation;
+  bool _isExpanded = false;
 
   @override
   void initState() {
@@ -41,12 +46,23 @@ class _TrackNodeWidgetState extends State<TrackNodeWidget>
       vsync: this,
       duration: const Duration(seconds: 30),
     )..repeat();
+
+    // Expand animation for subCategories
+    _expandController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _expandAnimation = CurvedAnimation(
+      parent: _expandController,
+      curve: Curves.easeOutBack,
+    );
   }
 
   @override
   void dispose() {
     _animController.dispose();
     _spinController.dispose();
+    _expandController.dispose();
     super.dispose();
   }
 
@@ -56,7 +72,19 @@ class _TrackNodeWidgetState extends State<TrackNodeWidget>
 
   void _onTapUp(TapUpDetails details) {
     _animController.reverse();
-    widget.onTap?.call();
+    if (widget.track.subCategories != null &&
+        widget.track.subCategories!.isNotEmpty) {
+      setState(() {
+        _isExpanded = !_isExpanded;
+        if (_isExpanded) {
+          _expandController.forward();
+        } else {
+          _expandController.reverse();
+        }
+      });
+    } else {
+      widget.onTap?.call();
+    }
   }
 
   void _onTapCancel() {
@@ -112,8 +140,8 @@ class _TrackNodeWidgetState extends State<TrackNodeWidget>
     final isAlveolares =
         widget.track.id == 'alveolares'; // active focused node in HTML
 
-    final nodeSize = isFinal ? 80.0 : 64.0;
-    
+    final nodeSize = isFinal ? 100.0 : 80.0;
+
     final bgColor = Color(widget.track.bgColorHex);
     final textColor = Color(widget.track.textColorHex);
     final borderColor = Color(widget.track.borderColorHex);
@@ -127,16 +155,91 @@ class _TrackNodeWidgetState extends State<TrackNodeWidget>
           alignment: Alignment.center,
           clipBehavior: Clip.none,
           children: [
+            // Sub-category nodes
+            if (widget.track.subCategories != null &&
+                widget.track.subCategories!.isNotEmpty)
+              ...List.generate(widget.track.subCategories!.length, (index) {
+                final subCat = widget.track.subCategories![index];
+                // Open in the opposite direction of the text label
+                final bool openToLeft = widget.horizontalOffset < 0;
+                final double baseAngle = openToLeft ? math.pi : 0.0;
+                final double angle =
+                    baseAngle +
+                    (index == 0
+                        ? -math.pi * 0.15
+                        : math.pi * 0.15); // Spread angle
+                final double distance = 85.0;
+                return AnimatedBuilder(
+                  animation: _expandAnimation,
+                  builder: (context, child) {
+                    final currentDist = distance * _expandAnimation.value;
+                    return Positioned(
+                      left:
+                          160 +
+                          widget.horizontalOffset -
+                          29 + // Half of child size (58 / 2)
+                          math.cos(angle) * currentDist,
+                      top: 50 - 29 + math.sin(angle) * currentDist,
+                      child: Opacity(
+                        opacity: _expandAnimation.value.clamp(0.0, 1.0),
+                        child: Transform.scale(
+                          scale: _expandAnimation.value.clamp(0.0, 1.0),
+                          child: GestureDetector(
+                            onTap: () {
+                              if (_isExpanded) {
+                                widget.onSubCategoryTap?.call(subCat.id);
+                              }
+                            },
+                            child: Container(
+                              width: 58,
+                              height: 58,
+                              decoration:
+                                  MikiDecorations.glassMorphism(
+                                    borderRadius: 29,
+                                    bgColor: bgColor.withValues(alpha: 0.9),
+                                    borderColor: borderColor,
+                                  ).copyWith(
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: textColor.withValues(alpha: 0.1),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                              child: Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(6.0),
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      subCat.title,
+                                      style: MikiTextStyles.labelSm(
+                                        color: textColor,
+                                      ).copyWith(fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                );
+              }),
+
             // Outer glowing and rotating effects for active/special nodes
             if (isAlveolares) ...[
               // Concentric soft border circles
               Positioned(
-                left: 160 + widget.horizontalOffset - 62,
-                top: 50 - 62,
+                left: 160 + widget.horizontalOffset - 72,
+                top: 50 - 72,
                 child: IgnorePointer(
                   child: Container(
-                    width: 124,
-                    height: 124,
+                    width: 144,
+                    height: 144,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
@@ -148,12 +251,12 @@ class _TrackNodeWidgetState extends State<TrackNodeWidget>
                 ),
               ),
               Positioned(
-                left: 160 + widget.horizontalOffset - 52,
-                top: 50 - 52,
+                left: 160 + widget.horizontalOffset - 56,
+                top: 50 - 56,
                 child: IgnorePointer(
                   child: Container(
-                    width: 104,
-                    height: 104,
+                    width: 112,
+                    height: 112,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
@@ -168,8 +271,8 @@ class _TrackNodeWidgetState extends State<TrackNodeWidget>
             if (isFinal) ...[
               // Dash rotating circle
               Positioned(
-                left: 160 + widget.horizontalOffset - 60,
-                top: 50 - 60,
+                left: 160 + widget.horizontalOffset - 70,
+                top: 50 - 70,
                 child: AnimatedBuilder(
                   animation: _spinController,
                   builder: (context, child) {
@@ -179,7 +282,7 @@ class _TrackNodeWidgetState extends State<TrackNodeWidget>
                     );
                   },
                   child: CustomPaint(
-                    size: const Size(120, 120),
+                    size: const Size(140, 140),
                     painter: DashedCirclePainter(
                       color: MikiColors.primary.withValues(alpha: 0.2),
                       strokeWidth: 0.5,
@@ -215,10 +318,7 @@ class _TrackNodeWidgetState extends State<TrackNodeWidget>
                               begin: Alignment.bottomLeft,
                               end: Alignment.topRight,
                             ),
-                            border: Border.all(
-                              color: borderColor,
-                              width: 2.0,
-                            ),
+                            border: Border.all(color: borderColor, width: 2.0),
                             boxShadow: [
                               BoxShadow(
                                 color: MikiColors.primary.withValues(
@@ -236,19 +336,14 @@ class _TrackNodeWidgetState extends State<TrackNodeWidget>
                           ).copyWith(
                             boxShadow: [
                               BoxShadow(
-                                color: textColor.withValues(
-                                  alpha: 0.08,
-                                ),
+                                color: textColor.withValues(alpha: 0.08),
                                 blurRadius: 12,
                                 offset: const Offset(0, 4),
                               ),
                             ],
                           ),
                     child: Center(
-                      child: _buildIcon(
-                        widget.track.id,
-                        textColor,
-                      ),
+                      child: _buildIcon(widget.track.id, textColor),
                     ),
                   ),
                 ),
@@ -273,15 +368,10 @@ class _TrackNodeWidgetState extends State<TrackNodeWidget>
                 children: [
                   Text(
                     widget.track.title,
-                    style:
-                        MikiTextStyles.headlineSm(
-                          color: textColor,
-                        ).copyWith(
-                          fontSize: 18,
-                          fontWeight: isFinal
-                              ? FontWeight.bold
-                              : FontWeight.w500,
-                        ),
+                    style: MikiTextStyles.headlineSm(color: textColor).copyWith(
+                      fontSize: 18,
+                      fontWeight: isFinal ? FontWeight.bold : FontWeight.w500,
+                    ),
                   ),
                   const SizedBox(height: 2),
                   Text(

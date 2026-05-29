@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "185342886878",
+    "project_id": "fonemas-kit",
+    "storage_bucket": "fonemas-kit.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:185342886878:android:3f047cd718b3a806f5934f",
+        "android_client_info": {
+          "package_name": "com.example.fonemas_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "185342886878-ckpvarq71q2jupif0ev1uvedf13o25os.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.fonemas_app",
+            "certificate_hash": "a394627eae4dd31beb3d616c2f698b980ddf74e0"
+          }
+        },
+        {
+          "client_id": "185342886878-keu7ghbe5eau9iu2vqa7pkldscpoom6d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD85S48-cCy7Gc1kLWdpQ2VO65QS3MW13U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "185342886878-keu7ghbe5eau9iu2vqa7pkldscpoom6d.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "185342886878-sedv5jfvaok5phd2dbmrp35vhavh1n8u.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.fonemasApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
