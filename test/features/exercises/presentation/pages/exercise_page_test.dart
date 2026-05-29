@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
-import 'package:fonemas_app/features/exercises/presentation/pages/exercise_page.dart';
-import 'package:fonemas_app/features/exercises/presentation/bloc/exercise_cubit.dart';
-import 'package:fonemas_app/features/exercises/data/repositories/mock_exercise_repository.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:fonemas_app/generated/l10n/app_localizations.dart';
+import 'package:fonemas_app/ui/features/exercises/views/exercise_page.dart';
+import 'package:fonemas_app/ui/features/exercises/view_models/exercise_view_model.dart';
+import 'package:fonemas_app/data/repositories/mock_exercise_repository.dart';
 
 void main() {
   testWidgets('ExercisePage integration flow test', (WidgetTester tester) async {
@@ -25,8 +27,8 @@ void main() {
           path: '/exercise/:trackId',
           builder: (context, state) {
             final trackId = state.pathParameters['trackId']!;
-            return BlocProvider(
-              create: (_) => ExerciseCubit(MockExerciseRepository())..loadExercises(trackId),
+            return ChangeNotifierProvider(
+              create: (_) => ExerciseViewModel(MockExerciseRepository())..loadExercises(trackId),
               child: ExercisePage(trackId: trackId),
             );
           },
@@ -37,6 +39,16 @@ void main() {
     await tester.pumpWidget(
       MaterialApp.router(
         routerConfig: router,
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('pt', 'BR'),
+          Locale('pt'),
+        ],
       ),
     );
 
@@ -117,7 +129,7 @@ void main() {
     await tester.tap(find.text('VOLTAR PARA A TRILHA'));
     await tester.pumpAndSettle();
 
-    // Verify we have navigated back to the track page
+    // Verify we have navigated back to the track page (which is simulated by the router popping)
     expect(find.text('TrackPage: sons_liquidos'), findsOneWidget);
   });
 }

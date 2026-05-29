@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:fonemas_app/features/exercises/domain/entities/exercise.dart';
-import 'package:fonemas_app/features/exercises/presentation/strategies/minimal_pairs_strategy.dart';
+import 'package:fonemas_app/domain/models/exercise.dart';
+import 'package:fonemas_app/ui/features/exercises/views/strategies/minimal_pairs_strategy.dart';
 
 void main() {
   testWidgets('MinimalPairsStrategy renders 2-option image card row correctly', (WidgetTester tester) async {

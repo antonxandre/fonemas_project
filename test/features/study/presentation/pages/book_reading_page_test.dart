@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
-import 'package:fonemas_app/features/study/presentation/pages/book_reading_page.dart';
-import 'package:fonemas_app/features/study/presentation/bloc/book_reading_cubit.dart';
-import 'package:fonemas_app/features/study/data/repositories/mock_study_repository.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:fonemas_app/generated/l10n/app_localizations.dart';
+import 'package:fonemas_app/ui/features/study/views/book_reading_page.dart';
+import 'package:fonemas_app/ui/features/study/view_models/book_reading_view_model.dart';
+import 'package:fonemas_app/data/repositories/mock_study_repository.dart';
 
 void main() {
   testWidgets('BookReadingPage renders pages and handles page turning flow', (WidgetTester tester) async {
@@ -19,8 +21,8 @@ void main() {
           path: '/study/read/:bookId',
           builder: (context, state) {
             final bookId = state.pathParameters['bookId']!;
-            return BlocProvider(
-              create: (_) => BookReadingCubit(MockStudyRepository())..loadBook(bookId),
+            return ChangeNotifierProvider(
+              create: (_) => BookReadingViewModel(MockStudyRepository())..loadBook(bookId),
               child: BookReadingPage(bookId: bookId),
             );
           },
@@ -31,6 +33,16 @@ void main() {
     await tester.pumpWidget(
       MaterialApp.router(
         routerConfig: router,
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('pt', 'BR'),
+          Locale('pt'),
+        ],
       ),
     );
 
@@ -85,10 +97,10 @@ void main() {
 
     // Verify celebration dialog elements are visible
     expect(find.text('Leitura Concluída!'), findsOneWidget);
-    expect(find.text('VOLTAR PARA ESTUDOS'), findsOneWidget);
+    expect(find.text('VOLTAR PARA A TRILHA'), findsOneWidget); // Matches l10n.backToTrack ("VOLTAR PARA A TRILHA")
 
     // Tap return button to return to Study Page
-    await tester.tap(find.text('VOLTAR PARA ESTUDOS'));
+    await tester.tap(find.text('VOLTAR PARA A TRILHA'));
     await tester.pumpAndSettle();
 
     // Verify we navigated back to /study (StudyHomePage mockup)

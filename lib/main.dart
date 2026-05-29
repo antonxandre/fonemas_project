@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'core/navigation/router.dart';
-import 'features/learning_path/presentation/bloc/learning_path_cubit.dart';
-import 'features/learning_path/data/repositories/mock_learning_path_repository.dart';
-import 'features/study/presentation/bloc/study_cubit.dart';
-import 'features/study/data/repositories/mock_study_repository.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'generated/l10n/app_localizations.dart';
+import 'ui/core/navigation/router.dart';
+import 'ui/features/learning_path/view_models/learning_path_view_model.dart';
+import 'ui/features/study/view_models/study_view_model.dart';
+import 'data/repositories/mock_learning_path_repository.dart';
+import 'data/repositories/mock_study_repository.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,18 +18,28 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
+    return MultiProvider(
       providers: [
-        BlocProvider(
-          create: (_) => LearningPathCubit(MockLearningPathRepository())..loadTracks(),
+        ChangeNotifierProvider(
+          create: (_) => LearningPathViewModel(MockLearningPathRepository())..loadTracks(),
         ),
-        BlocProvider(
-          create: (_) => StudyCubit(MockStudyRepository())..loadBooks(),
+        ChangeNotifierProvider(
+          create: (_) => StudyViewModel(MockStudyRepository())..loadBooks(),
         ),
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
         routerConfig: mikiRouter,
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('pt', 'BR'),
+          Locale('pt'),
+        ],
       ),
     );
   }

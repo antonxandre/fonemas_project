@@ -1,0 +1,100 @@
+{
+  "learningPathTitle": "Trilhas de Aprendizado",
+  "@learningPathTitle": {
+    "description": "Title of the learning path section"
+  },
+  "learningPathSubtitle": "Encontre o caminho suave para a sua voz florescer hoje.",
+  "@learningPathSubtitle": {
+    "description": "Subtitle of the learning path section"
+  },
+  "start": "Início",
+  "@start": {
+    "description": "Label for start or home navigation"
+  },
+  "errorLoadingTracks": "Erro ao carregar trilhas",
+  "@errorLoadingTracks": {
+    "description": "Error message when tracks fail to load"
+  },
+  "tryAgain": "Tentar Novamente",
+  "@tryAgain": {
+    "description": "Button label to retry loading"
+  },
+  "congratulations": "Parabéns!",
+  "@congratulations": {
+    "description": "Congratulatory dialog title"
+  },
+  "completedAllExercises": "Você concluiu com sucesso todos os exercícios de Pares Mínimos!",
+  "@completedAllExercises": {
+    "description": "Success message when completing all exercises"
+  },
+  "backToTrack": "VOLTAR PARA A TRILHA",
+  "@backToTrack": {
+    "description": "Button label to navigate back to the learning path"
+  },
+  "errorLoadingExercises": "Erro ao carregar exercícios",
+  "@errorLoadingExercises": {
+    "description": "Error message when exercises fail to load"
+  },
+  "minimalPairs": "Pares Mínimos",
+  "@minimalPairs": {
+    "description": "Title of the minimal pairs exercise"
+  },
+  "replaying": "REPRODUZINDO...",
+  "@replaying": {
+    "description": "Status text while replaying audio"
+  },
+  "listenAgain": "OUVIR NOVAMENTE",
+  "@listenAgain": {
+    "description": "Button label to play audio again"
+  },
+  "exerciseProgress": "Exercício {current} de {total}",
+  "@exerciseProgress": {
+    "description": "Label showing progress through exercises",
+    "placeholders": {
+      "current": {
+        "type": "int",
+        "example": "1"
+      },
+      "total": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "studyArea": "Área de Estudos",
+  "@studyArea": {
+    "description": "Title of the study section"
+  },
+  "studyDescription": "Leia livros infantis especialmente criados para trabalhar fonemas.",
+  "@studyDescription": {
+    "description": "Subtitle of the study section"
+  },
+  "readingModule": "Módulo de Leitura",
+  "@readingModule": {
+    "description": "Header title of the reading session"
+  },
+  "errorLoadingBooks": "Erro ao carregar livros",
+  "@errorLoadingBooks": {
+    "description": "Error message when books fail to load"
+  },
+  "profileTitle": "Perfil do Usuário",
+  "@profileTitle": {
+    "description": "Title of the profile page"
+  },
+  "profileSubtitle": "Acompanhe seu progresso e conquistas clínicas.",
+  "@profileSubtitle": {
+    "description": "Subtitle of the profile page"
+  },
+  "mikiStyle": "Miki Style",
+  "@mikiStyle": {
+    "description": "Brand aesthetic tag"
+  },
+  "errorLoadingBook": "Erro ao carregar o livro",
+  "@errorLoadingBook": {
+    "description": "Error message when a single book fails to load"
+  },
+  "whereIsSound": "Onde está o som certo?",
+  "@whereIsSound": {
+    "description": "Prompt for identifying correct sound image"
+  }
+}

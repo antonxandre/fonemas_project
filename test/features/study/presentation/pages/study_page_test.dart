@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
-import 'package:fonemas_app/features/study/presentation/pages/study_page.dart';
-import 'package:fonemas_app/features/study/presentation/bloc/study_cubit.dart';
-import 'package:fonemas_app/features/study/data/repositories/mock_study_repository.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:fonemas_app/generated/l10n/app_localizations.dart';
+import 'package:fonemas_app/ui/features/study/views/study_page.dart';
+import 'package:fonemas_app/ui/features/study/view_models/study_view_model.dart';
+import 'package:fonemas_app/data/repositories/mock_study_repository.dart';
 
 void main() {
   testWidgets('StudyPage renders books and navigates', (WidgetTester tester) async {
@@ -13,8 +15,8 @@ void main() {
       routes: [
         GoRoute(
           path: '/study',
-          builder: (context, state) => BlocProvider(
-            create: (_) => StudyCubit(MockStudyRepository())..loadBooks(),
+          builder: (context, state) => ChangeNotifierProvider(
+            create: (_) => StudyViewModel(MockStudyRepository())..loadBooks(),
             child: const StudyPage(),
           ),
         ),
@@ -30,6 +32,16 @@ void main() {
     await tester.pumpWidget(
       MaterialApp.router(
         routerConfig: router,
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('pt', 'BR'),
+          Locale('pt'),
+        ],
       ),
     );
 
@@ -40,9 +52,9 @@ void main() {
     await tester.pump(const Duration(milliseconds: 200));
     await tester.pump();
 
-    // Verify static content
+    // Verify static content (localized)
     expect(find.text('Área de Estudos'), findsOneWidget);
-    expect(find.text('Explore histórias e aprenda brincando.'), findsOneWidget);
+    expect(find.text('Leia livros infantis especialmente criados para trabalhar fonemas.'), findsOneWidget);
 
     // Verify recommended book card
     expect(find.text('A Jornada do Pequeno Som'), findsOneWidget);
