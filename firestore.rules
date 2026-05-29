@@ -65,5 +65,10 @@ service cloud.firestore {
       allow create, update: if isValidExercise(request.resource.data);
       allow delete: if false; // Deny deletes entirely
     }
+
+    match /user_progress/{uid} {
+      // Allow read and write only if the user is authenticated and is accessing their own document
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
   }
 }
