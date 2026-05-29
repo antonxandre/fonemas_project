@@ -18,8 +18,9 @@ class TrackSubPathPage extends StatefulWidget {
   State<TrackSubPathPage> createState() => _TrackSubPathPageState();
 }
 
-class _TrackSubPathPageState extends State<TrackSubPathPage> with SingleTickerProviderStateMixin {
+class _TrackSubPathPageState extends State<TrackSubPathPage> with TickerProviderStateMixin {
   late AnimationController _glowController;
+  late AnimationController _staggerController;
 
   @override
   void initState() {
@@ -29,10 +30,22 @@ class _TrackSubPathPageState extends State<TrackSubPathPage> with SingleTickerPr
       vsync: this,
       duration: const Duration(seconds: 4),
     )..repeat(reverse: true);
+
+    // Staggered entrance animation for nodes
+    _staggerController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    );
+
+    // Trigger stagger shortly after page opens
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (mounted) _staggerController.forward();
+    });
   }
 
   @override
   void dispose() {
+    _staggerController.dispose();
     _glowController.dispose();
     super.dispose();
   }
@@ -117,30 +130,68 @@ class _TrackSubPathPageState extends State<TrackSubPathPage> with SingleTickerPr
                               else
                                 ...List.generate(viewModel.phonemes.length, (index) {
                                   final phoneme = viewModel.phonemes[index];
-                                  // Alternate horizontal offsets for the wavy path
                                   final double horizontalOffset = index % 2 == 0 ? 48.0 : -48.0;
+
+                                  // Compute status
+                                  SubNodeStatus status;
+                                  if (viewModel.completedPhonemeIds.contains(phoneme.id)) {
+                                    status = SubNodeStatus.completed;
+                                  } else {
+                                    // It's not completed. Is it the first non-completed one?
+                                    // Check if all previous ones are completed
+                                    bool allPreviousCompleted = true;
+                                    for (int i = 0; i < index; i++) {
+                                      if (!viewModel.completedPhonemeIds.contains(viewModel.phonemes[i].id)) {
+                                        allPreviousCompleted = false;
+                                        break;
+                                      }
+                                    }
+                                    status = allPreviousCompleted ? SubNodeStatus.active : SubNodeStatus.locked;
+                                  }
+
+                                  // Calculate stagger animation intervals
+                                  final double start = (index / viewModel.phonemes.length) * 0.8;
+                                  final double end = (start + 0.2).clamp(0.0, 1.0);
+                                  final animation = CurvedAnimation(
+                                    parent: _staggerController,
+                                    curve: Interval(start, end, curve: Curves.easeOutBack),
+                                  );
                                   
-                                  return Column(
-                                    children: [
-                                      _buildSubPathNode(
-                                        label: phoneme.name,
-                                        symbol: phoneme.symbol,
-                                        status: index == 0 ? SubNodeStatus.active : SubNodeStatus.locked, // Only first is active for demo
-                                        horizontalOffset: horizontalOffset,
-                                        onTap: () => context.push('/exercise/${widget.trackId}'),
+                                  return ScaleTransition(
+                                    scale: animation,
+                                    child: FadeTransition(
+                                      opacity: animation,
+                                      child: Column(
+                                        children: [
+                                          _buildSubPathNode(
+                                            label: phoneme.name,
+                                            symbol: phoneme.symbol,
+                                            status: status,
+                                            horizontalOffset: horizontalOffset,
+                                            onTap: status != SubNodeStatus.locked 
+                                                ? () => context.push('/exercise/${phoneme.id}')
+                                                : null,
+                                          ),
+                                          if (index < viewModel.phonemes.length - 1)
+                                            const SizedBox(height: 24),
+                                        ],
                                       ),
-                                      if (index < viewModel.phonemes.length - 1)
-                                        const SizedBox(height: 24),
-                                    ],
+                                    ),
                                   );
                                 }),
                               const SizedBox(height: 36),
 
                               // Final Destination Node
                               if (!viewModel.isLoading && viewModel.phonemes.isNotEmpty)
-                                _buildFinalDestinationNode(
-                                  label: 'O Grande Orador',
-                                  horizontalOffset: 0,
+                                ScaleTransition(
+                                  scale: CurvedAnimation(
+                                    parent: _staggerController,
+                                    curve: const Interval(0.8, 1.0, curve: Curves.easeOutBack),
+                                  ),
+                                  child: _buildFinalDestinationNode(
+                                    label: 'O Grande Orador',
+                                    horizontalOffset: 0,
+                                  ),
                                 ),
                             ],
                           ),
@@ -403,6 +454,7 @@ class _TrackSubPathPageState extends State<TrackSubPathPage> with SingleTickerPr
         );
         child = const Icon(
           Icons.check,
+          key: ValueKey('icon_check'),
           color: MikiColors.primary,
           size: 20,
         );
@@ -423,6 +475,7 @@ class _TrackSubPathPageState extends State<TrackSubPathPage> with SingleTickerPr
         );
         child = Text(
           symbol ?? '/l/',
+          key: const ValueKey('text_symbol'),
           style: MikiTextStyles.headlineLg(color: MikiColors.primary).copyWith(
             fontWeight: FontWeight.w300,
           ),
@@ -507,11 +560,24 @@ class _TrackSubPathPageState extends State<TrackSubPathPage> with SingleTickerPr
                 onTap: status == SubNodeStatus.active ? onTap : null,
                 child: Opacity(
                   opacity: status == SubNodeStatus.locked ? 0.4 : 1.0,
-                  child: Container(
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 600),
+                    curve: Curves.easeOutBack,
                     width: nodeSize,
                     height: nodeSize,
                     decoration: decoration,
-                    child: Center(child: child),
+                    child: Center(
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 500),
+                        transitionBuilder: (Widget child, Animation<double> animation) {
+                          return ScaleTransition(
+                            scale: animation,
+                            child: child,
+                          );
+                        },
+                        child: child,
+                      ),
+                    ),
                   ),
                 ),
               ),

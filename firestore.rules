@@ -33,6 +33,19 @@ service cloud.firestore {
              data.categoryId is string && data.categoryId.size() < 50 &&
              data.subcategoryId is string && data.subcategoryId.size() < 50 &&
              data.locale is string && data.locale.size() < 10;
+     }
+
+    // Domain Validators for Exercise
+    function isValidExercise(data) {
+      return data.keys().hasAll(['type', 'prompt', 'options', 'correctOption', 'phonemeId']) &&
+             (data.keys().hasOnly(['type', 'prompt', 'options', 'correctOption', 'phonemeId']) ||
+              data.keys().hasOnly(['type', 'prompt', 'options', 'correctOption', 'phonemeId', 'audioUrl'])) &&
+             data.type is string && data.type.size() < 50 &&
+             data.prompt is string && data.prompt.size() < 200 &&
+             data.options is list &&
+             data.correctOption is string && data.correctOption.size() < 100 &&
+             data.phonemeId is string && data.phonemeId.size() < 100 &&
+             (!data.keys().hasAny(['audioUrl']) || data.audioUrl is string);
     }
 
     match /phonemes/{phonemeId} {
@@ -41,6 +54,15 @@ service cloud.firestore {
       
       // Allow write access for database seeding (temporarily open for prototype, needs hardening)
       allow create, update: if isValidPhoneme(request.resource.data);
+      allow delete: if false; // Deny deletes entirely
+    }
+
+    match /exercises/{exerciseId} {
+      // Allow read access for everyone so users can view exercises in the app
+      allow read: if true;
+      
+      // Allow write access for database seeding
+      allow create, update: if isValidExercise(request.resource.data);
       allow delete: if false; // Deny deletes entirely
     }
   }

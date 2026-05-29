@@ -47,4 +47,7 @@ app.*.map.json
 # Agent specific files
 .agents/
 skills-lock.json
+.npm-cache/
 
+# Android build directory
+/android/build/

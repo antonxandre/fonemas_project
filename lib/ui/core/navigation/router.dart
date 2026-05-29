@@ -8,9 +8,10 @@ import '../../features/learning_path/views/learning_path_page.dart';
 import '../../features/learning_path/views/track_sub_path_page.dart';
 import '../../features/exercises/views/exercise_page.dart';
 import '../../features/exercises/view_models/exercise_view_model.dart';
-import '../../../data/repositories/mock_exercise_repository.dart';
+import '../../../data/repositories/firebase_exercise_repository.dart';
 import '../../features/learning_path/view_models/track_sub_path_view_model.dart';
 import '../../../data/repositories/firebase_phoneme_repository.dart';
+import '../../../data/repositories/firebase_user_progress_repository.dart';
 import '../../features/study/views/study_page.dart';
 import '../../features/study/views/book_reading_page.dart';
 import '../../features/study/view_models/book_reading_view_model.dart';
@@ -90,11 +91,16 @@ GoRouter createMikiRouter(AuthViewModel authViewModel) {
       path: '/track/:trackId',
       pageBuilder: (context, state) {
         final trackId = state.pathParameters['trackId'] ?? 'alveolares';
+        final uid = authViewModel.currentUser.id;
         return MikiFadeScaleTransitionPage(
           key: state.pageKey,
           name: state.uri.toString(),
           child: ChangeNotifierProvider(
-            create: (_) => TrackSubPathViewModel(FirebasePhonemeRepository())..loadPhonemes(trackId),
+            create: (_) => TrackSubPathViewModel(
+              FirebasePhonemeRepository(),
+              FirebaseUserProgressRepository(),
+              uid,
+            )..loadPhonemes(trackId),
             child: TrackSubPathPage(trackId: trackId),
           ),
         );
@@ -105,11 +111,16 @@ GoRouter createMikiRouter(AuthViewModel authViewModel) {
       pageBuilder: (context, state) {
         final trackId = state.pathParameters['trackId'] ?? 'vogais';
         final subCategoryId = state.pathParameters['subCategoryId'] ?? 'orais';
+        final uid = authViewModel.currentUser.id;
         return MikiFadeScaleTransitionPage(
           key: state.pageKey,
           name: state.uri.toString(),
           child: ChangeNotifierProvider(
-            create: (_) => TrackSubPathViewModel(FirebasePhonemeRepository())..loadPhonemes(trackId, subCategoryId: subCategoryId),
+            create: (_) => TrackSubPathViewModel(
+              FirebasePhonemeRepository(),
+              FirebaseUserProgressRepository(),
+              uid,
+            )..loadPhonemes(trackId, subCategoryId: subCategoryId),
             child: TrackSubPathPage(trackId: trackId, subCategoryId: subCategoryId),
           ),
         );
@@ -119,8 +130,13 @@ GoRouter createMikiRouter(AuthViewModel authViewModel) {
       path: '/exercise/:trackId',
       builder: (context, state) {
         final trackId = state.pathParameters['trackId'] ?? 'sons_liquidos';
+        final uid = authViewModel.currentUser.id;
         return ChangeNotifierProvider(
-          create: (_) => ExerciseViewModel(MockExerciseRepository())..loadExercises(trackId),
+          create: (_) => ExerciseViewModel(
+            FirebaseExerciseRepository(),
+            FirebaseUserProgressRepository(),
+            uid,
+          )..loadExercises(trackId),
           child: ExercisePage(trackId: trackId),
         );
       },

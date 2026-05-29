@@ -12,14 +12,16 @@ import 'firebase_options.dart';
 import 'ui/features/auth/view_models/auth_view_model.dart';
 import 'data/repositories/firebase_auth_repository.dart';
 import 'data/seeders/phoneme_seeder.dart';
+import 'data/seeders/exercise_seeder.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
   
-  // Seed phonemes if database is empty
+  // Seed data if database is empty
   await PhonemeSeeder().seedIfNeeded();
+  await ExerciseSeeder().seedIfNeeded();
 
   runApp(const MainApp());
 }

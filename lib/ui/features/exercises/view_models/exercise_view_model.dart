@@ -1,11 +1,14 @@
 import 'package:flutter/foundation.dart';
 import '../../../../../domain/models/exercise.dart';
 import '../../../../../domain/repositories/exercise_repository.dart';
+import '../../../../../domain/repositories/user_progress_repository.dart';
 
 class ExerciseViewModel extends ChangeNotifier {
   final ExerciseRepository _repository;
+  final UserProgressRepository _progressRepository;
+  final String _uid;
 
-  ExerciseViewModel(this._repository);
+  ExerciseViewModel(this._repository, this._progressRepository, this._uid);
 
   List<Exercise> _exercises = [];
   List<Exercise> get exercises => _exercises;
@@ -31,9 +34,12 @@ class ExerciseViewModel extends ChangeNotifier {
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
+  String? _trackId;
+
   Exercise get currentExercise => _exercises[_currentIndex];
 
   Future<void> loadExercises(String trackId) async {
+    _trackId = trackId;
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -70,6 +76,13 @@ class ExerciseViewModel extends ChangeNotifier {
         _isAnswerCorrect = null;
       } else {
         _isCompleted = true;
+        if (_trackId != null) {
+          try {
+            await _progressRepository.markPhonemeCompleted(_uid, _trackId!);
+          } catch (e) {
+            debugPrint('Failed to mark phoneme completed: $e');
+          }
+        }
       }
       notifyListeners();
     } else {
