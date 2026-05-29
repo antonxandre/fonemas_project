@@ -45,7 +45,7 @@ service cloud.firestore {
              data.options is list &&
              data.correctOption is string && data.correctOption.size() < 100 &&
              data.phonemeId is string && data.phonemeId.size() < 100 &&
-             (!data.keys().hasAny(['audioUrl']) || data.audioUrl is string);
+             (!data.keys().hasAny(['audioUrl']) || data.audioUrl is string || data.audioUrl == null);
     }
 
     match /phonemes/{phonemeId} {

@@ -10,7 +10,7 @@ class ExerciseOption {
   Map<String, dynamic> toMap() {
     return {
       'text': text,
-      'imageUrl': imageUrl,
+      if (imageUrl != null) 'imageUrl': imageUrl,
     };
   }
 
@@ -45,7 +45,7 @@ class Exercise {
       'prompt': prompt,
       'options': options.map((x) => x.toMap()).toList(),
       'correctOption': correctOption,
-      'audioUrl': audioUrl,
+      if (audioUrl != null) 'audioUrl': audioUrl,
     };
   }
 
