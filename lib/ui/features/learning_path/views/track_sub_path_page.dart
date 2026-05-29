@@ -169,7 +169,12 @@ class _TrackSubPathPageState extends State<TrackSubPathPage> with TickerProvider
                                             status: status,
                                             horizontalOffset: horizontalOffset,
                                             onTap: status != SubNodeStatus.locked 
-                                                ? () => context.push('/exercise/${phoneme.id}')
+                                                ? () async {
+                                                    final result = await context.push<bool>('/exercise/${phoneme.id}');
+                                                    if (result == true) {
+                                                      viewModel.markPhonemeCompletedInMemory(phoneme.id);
+                                                    }
+                                                  }
                                                 : null,
                                           ),
                                           if (index < viewModel.phonemes.length - 1)

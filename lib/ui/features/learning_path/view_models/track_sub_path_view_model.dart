@@ -47,4 +47,11 @@ class TrackSubPathViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  void markPhonemeCompletedInMemory(String phonemeId) {
+    if (!_completedPhonemeIds.contains(phonemeId)) {
+      _completedPhonemeIds = [..._completedPhonemeIds, phonemeId];
+      notifyListeners();
+    }
+  }
 }

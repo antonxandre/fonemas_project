@@ -305,7 +305,7 @@ class ExercisePage extends StatelessWidget {
                   onPressed: () {
                     // Navigate back to the track
                     if (context.canPop()) {
-                      context.pop();
+                      context.pop(true);
                     } else {
                       context.go('/track/$trackId');
                     }
